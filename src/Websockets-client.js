@@ -1,17 +1,8 @@
-/* global Y, global */
-'use strict'
+/* global Y */
 
-// socket.io requires utf8. This package checks if it is required by requirejs.
-// If window.require is set, then it will define itself as a module. This is erratic behavior and
-// results in socket.io having a "bad request".
-// This is why we undefine global.define (it is set by requirejs) before we require socket.io-client.
-var define = global.define
-global.define = null
-var io = require('socket.io-client')
-// redefine global.define
-global.define = define
+import io from 'socket.io-client'
 
-function extend (Y) {
+export default function extend (Y) {
   class Connector extends Y.AbstractConnector {
     constructor (y, options) {
       if (options === undefined) {
@@ -72,7 +63,7 @@ function extend (Y) {
       if (!this.options.socket) {
         this.socket.disconnect()
       }
-      super.disconnect()
+      return super.disconnect()
     }
     destroy () {
       this.disconnect()
@@ -86,7 +77,7 @@ function extend (Y) {
     }
     reconnect () {
       this.socket.connect()
-      super.reconnect()
+      return super.reconnect()
     }
     send (uid, message) {
       message.room = this.options.room
@@ -102,11 +93,10 @@ function extend (Y) {
       return this.socket.disconnected
     }
   }
-  Connector.io = io
+  // Connector.io = io
   Y.extend('websockets-client', Connector)
 }
 
-module.exports = extend
 if (typeof Y !== 'undefined') {
   extend(Y)
 }
